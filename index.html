@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pyscript</title>
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="notebook">
+      <div class="tab">
+        <h2>Select</h2>
+        <div class="frame">
+          <label>Select speed:</label>
+          <button onclick="setSpeed('low')">Low</button>
+          <button onclick="setSpeed('medium')">Medium</button>
+          <button onclick="setSpeed('high')">High</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    function setSpeed(speed) {
+      var speedTab = document.createElement("div");
+      speedTab.className = "tab";
+      speedTab.innerHTML = "<h2>" + speed.toUpperCase() + "</h2>";
+
+      var frame = document.createElement("div");
+      frame.className = "frame";
+      frame.innerHTML = "<label>Speed: " + speed + "</label>" +
+                        "<label>Enter text to convert to speech:</label>" +
+                        "<textarea rows='5' cols='50'>Enter text here...</textarea>" +
+                        "<label>Select voice:</label>" +
+                        "<input type='radio' name='voice' value='male' checked> Male" +
+                        "<input type='radio' name='voice' value='female'> Female" +
+                        "<button onclick='convertText()'>Convert</button>" +
+                        "<button onclick='saveAudio()'>Save Audio</button>";
+
+      speedTab.appendChild(frame);
+      document.getElementById("app").appendChild(speedTab);
+    }
+
+    function convertText() {
+      var text = document.querySelector("textarea").value.trim();
+      if (text === "") return;
+
+      var utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.5;
+      utterance.pitch = document.querySelector("input[name='voice']:checked").value === "male" ? 1 : 2;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function saveAudio() {
+      var text = document.querySelector("textarea").value.trim();
+      if (text === "") return;
+
+      var utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.5;
+      utterance.pitch = document.querySelector("input[name='voice']:checked").value === "male" ? 1 : 2;
+
+      var blob = new Blob([text], { "type": "audio/mpeg" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "speech.mp3";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    setSpeed('medium'); // Default speed on page load
+  </script>
+</body>
+</html>
